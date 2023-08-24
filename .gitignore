@@ -484,4 +484,7 @@ $RECYCLE.BIN/
 *.swp
 
 # PostgreSQL
-.pgdata/
+pgdata/
+
+# mongoDB
+mongodata/

@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      POSTGRES_DB: auctions
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongopw
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodata:/data/db
+volumes:
+  pgdata:
+  mongodata:
