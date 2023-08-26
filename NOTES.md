@@ -24,3 +24,11 @@ dotnet ef database update
 dotnet ef database drop
 
 dotnet new gitignore
+
+dotnet new classlib -o src/Contracts
+dotnet sln add .\src\Contracts\
+dotnet add reference ..\..\src\Contracts
+
+dotnet ef migrations add Outbox
+
+dotnet ef database update InitialCreate
