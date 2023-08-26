@@ -32,3 +32,7 @@ dotnet add reference ..\..\src\Contracts
 dotnet ef migrations add Outbox
 
 dotnet ef database update InitialCreate
+
+dotnet new --install Duende.IdentityServer.Templates
+dotnet new isaspid -o src/IdentityService
+dotnet sln add .\src\IdentityService\
