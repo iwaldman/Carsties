@@ -36,3 +36,7 @@ dotnet ef database update InitialCreate
 dotnet new --install Duende.IdentityServer.Templates
 dotnet new isaspid -o src/IdentityService
 dotnet sln add .\src\IdentityService\
+
+dotnet tool update dotnet-ef -g
+
+dotnet ef migrations add "InitalCreate" -o Data/Migrations
