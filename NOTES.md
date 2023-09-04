@@ -40,3 +40,6 @@ dotnet sln add .\src\IdentityService\
 dotnet tool update dotnet-ef -g
 
 dotnet ef migrations add "InitalCreate" -o Data/Migrations
+
+new web -o src\GatewayService
+dotnet sln add .\src\GatewayService\
