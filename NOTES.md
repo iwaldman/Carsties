@@ -43,3 +43,12 @@ dotnet ef migrations add "InitalCreate" -o Data/Migrations
 
 new web -o src\GatewayService
 dotnet sln add .\src\GatewayService\
+
+docker build -f .\src\AuctionService\Dockerfile -t testing123 .
+
+docker compose -f .\docker-compose-anonymous-volumes.yml build auction-svc
+docker compose -f .\docker-compose-anonymous-volumes.yml build search-svc
+docker compose -f .\docker-compose-anonymous-volumes.yml build identity-svc
+docker compose -f .\docker-compose-anonymous-volumes.yml build gateway-svc
+
+

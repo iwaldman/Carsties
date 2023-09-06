@@ -1,9 +1,5 @@
-using System;
 using System.Net;
-using System.Net.Http;
 using MassTransit;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
 using SearchService.Consumers;
@@ -33,14 +29,15 @@ builder.Services.AddMassTransit(options =>
         {
             // Configure RabbitMq
             cfg.Host(
-                "localhost",
+                builder.Configuration["RabbitMq:Host"],
                 "/",
-                h =>
+                host =>
                 {
-                    h.Username(builder.Configuration["RabbitMqUser"]);
-                    h.Password(builder.Configuration["RabbitMqPassword"]);
+                    host.Username(builder.Configuration.GetValue("RabbitMq:User", "guest"));
+                    host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
                 }
             );
+
             cfg.ReceiveEndpoint(
                 "search-auction-created",
                 e =>
