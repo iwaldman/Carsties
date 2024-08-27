@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using MongoDB.Entities;
 using SearchService.Models;
 
@@ -10,9 +11,13 @@ namespace SearchService.Controllers;
 public class SearchController : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<Item>>> SearchItems(string? searchTerm)
+    public async Task<ActionResult<List<Item>>> SearchItems(
+        string? searchTerm,
+        int pageNumber = 1,
+        int pageSize = 10
+    )
     {
-        var query = DB.Find<Item>();
+        var query = DB.PagedSearch<Item>();
 
         query.Sort(x => x.Ascending(a => a.Make));
 
@@ -21,8 +26,17 @@ public class SearchController : ControllerBase
             query.Match(Search.Full, searchTerm).SortByTextScore();
         }
 
+        query.PageNumber(pageNumber).PageSize(pageSize);
+
         var result = await query.ExecuteAsync();
 
-        return Ok(result);
+        return Ok(
+            new
+            {
+                pageCount = result.PageCount,
+                totalCount = result.TotalCount,
+                results = result.Results
+            }
+        );
     }
 }
