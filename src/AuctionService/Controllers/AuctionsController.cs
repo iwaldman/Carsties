@@ -3,6 +3,7 @@ using AuctionService.Data;
 using AuctionService.Dtos;
 using AuctionService.Entities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,14 +14,22 @@ namespace AuctionService.Controllers;
 public class AuctionsController(AuctionDbContext auctionDbContext, IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions()
+    public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string? date)
     {
-        var auctions = await auctionDbContext
-            .Auctions.Include(x => x.Item)
-            .OrderBy(x => x.Item.Make)
+        var query = auctionDbContext.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
+
+        if (!string.IsNullOrEmpty(date))
+        {
+            query = query.Where(
+                x => x.UpdatedAt.Date.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0
+            );
+        }
+
+        var auctions = await query
+            .ProjectTo<AuctionDto>(mapper.ConfigurationProvider)
             .ToListAsync();
 
-        return mapper.Map<List<AuctionDto>>(auctions);
+        return auctions;
     }
 
     [HttpGet("{id}")]
@@ -65,7 +74,7 @@ public class AuctionsController(AuctionDbContext auctionDbContext, IMapper mappe
         var auction = await auctionDbContext
             .Auctions.Include(x => x.Item)
             .FirstOrDefaultAsync(x => x.Id == id);
-            
+
         if (auction is null)
         {
             return NotFound();
