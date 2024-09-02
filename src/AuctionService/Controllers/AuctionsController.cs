@@ -62,18 +62,19 @@ public class AuctionsController(
         auction.Seller = "test";
 
         auctionDbContext.Auctions.Add(auction);
-        var result = await auctionDbContext.SaveChangesAsync() > 0;
-
-        if (!result)
-        {
-            return BadRequest("Could not save changes to the DB.");
-        }
 
         var auctionDto = mapper.Map<AuctionDto>(auction);
 
         var auctionCreated = mapper.Map<AuctionCreated>(auctionDto);
 
         await publishEndpoint.Publish(auctionCreated);
+
+        var result = await auctionDbContext.SaveChangesAsync() > 0;
+
+        if (!result)
+        {
+            return BadRequest("Could not save changes to the DB.");
+        }
 
         return CreatedAtAction(nameof(GetAuctionById), new { auction.Id }, auctionDto);
     }
