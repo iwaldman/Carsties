@@ -23,6 +23,15 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq(
         (context, cfg) =>
         {
+            cfg.ReceiveEndpoint(
+                "serch-auction-created",
+                e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(5, 5));
+                    e.ConfigureConsumer<AuctionCreatedConsumer>(context);
+                }
+            );
+
             cfg.ConfigureEndpoints(context);
         }
     );
