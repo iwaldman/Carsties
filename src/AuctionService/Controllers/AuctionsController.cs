@@ -1,4 +1,3 @@
-using System;
 using AuctionService.Data;
 using AuctionService.Dtos;
 using AuctionService.Entities;
@@ -102,6 +101,10 @@ public class AuctionsController(
         auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
         auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
 
+        var auctionUpdated = mapper.Map<AuctionUpdated>(auction);
+
+        await publishEndpoint.Publish(auctionUpdated);
+
         var result = await auctionDbContext.SaveChangesAsync() > 0;
 
         if (result)
@@ -123,6 +126,10 @@ public class AuctionsController(
         }
 
         auctionDbContext.Remove(auction);
+
+        await publishEndpoint.Publish<AuctionDeleted>(
+            new AuctionDeleted { Id = auction.Id.ToString() }
+        );
 
         var result = await auctionDbContext.SaveChangesAsync() > 0;
 

@@ -1,4 +1,3 @@
-using System;
 using Contracts;
 using MassTransit;
 
@@ -15,7 +14,7 @@ public class AuctionCreatedFaultConsumer : IConsumer<Fault<AuctionCreated>>
         if (exception?.ExceptionType == typeof(ArgumentException).Name)
         {
             context.Message.Message.Model = "FooBar";
-            await context.Publish<AuctionCreated>(context.Message.Message);
+            await context.Publish(context.Message.Message);
         }
         else
         {
