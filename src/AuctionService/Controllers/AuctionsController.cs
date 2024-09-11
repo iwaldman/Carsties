@@ -60,7 +60,7 @@ public class AuctionsController(
         var auction = mapper.Map<Auction>(createAuctionDto);
 
         // TODO: add current user as the seller
-        auction.Seller = User.Identity?.Name ?? "test";
+        auction.Seller = User.Identity?.Name ?? "Unknown user";
 
         auctionDbContext.Auctions.Add(auction);
 
@@ -94,9 +94,7 @@ public class AuctionsController(
         }
 
         if (auction.Seller != User.Identity?.Name)
-        {
             return Forbid();
-        }
 
         auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
         auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
@@ -130,9 +128,7 @@ public class AuctionsController(
         }
 
         if (auction.Seller != User.Identity?.Name)
-        {
             return Forbid();
-        }
 
         auctionDbContext.Remove(auction);
 
