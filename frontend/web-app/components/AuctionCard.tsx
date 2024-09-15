@@ -1,8 +1,9 @@
 import CountdownTimer from '@/components/CountdownTimer'
 import CarImage from '@/components/CarImage'
+import { Auction } from '@/types'
 
 type Props = {
-  auction: any
+  auction: Auction
 }
 
 const AuctionCard = (props: Props) => {

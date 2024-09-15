@@ -33,7 +33,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }: RendererProps) =
 }
 
 type CountdownTimerProps = {
-  auctionEnd: number
+  auctionEnd: string
 }
 
 const CountdownTimer = ({ auctionEnd }: CountdownTimerProps) => {
