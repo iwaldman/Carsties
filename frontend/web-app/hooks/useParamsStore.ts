@@ -29,8 +29,10 @@ const initialState: State = {
   seller: undefined,
   winner: undefined,
 }
-const useParamsStore = create<State & Actions>((set) => ({
+
+export const useParamsStore = create<State & Actions>()((set) => ({
   ...initialState,
+
   setParams: (newParams: Partial<State>) => {
     set((state) => {
       if (newParams.pageNumber) {
@@ -40,10 +42,12 @@ const useParamsStore = create<State & Actions>((set) => ({
       }
     })
   },
-  reset: () => set(initialState),
+
+  reset: () => {
+    set(initialState)
+  },
+
   setSearchValue: (value: string) => {
     set({ searchValue: value })
   },
 }))
-
-export default useParamsStore

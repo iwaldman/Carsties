@@ -1,3 +1,9 @@
+import Listings from '@/components/Listings'
+
 export default function Home() {
-  return <div>Content goes here!</div>
+  return (
+    <div>
+      <Listings />
+    </div>
+  )
 }

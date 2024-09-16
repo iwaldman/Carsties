@@ -7,8 +7,9 @@ import { useState, useEffect } from 'react'
 import getData from '@/app/actions/auctionActions'
 import Filters from '@/components/Filters'
 import { useShallow } from 'zustand/shallow'
-import useParamsStore from '@/hooks/useParamsStore'
+import { useParamsStore } from '@/hooks/useParamsStore'
 import qs from 'query-string'
+import EmptyFilter from '@/components/EmptyFilter'
 
 const Listings = () => {
   const [data, setData] = useState<PagedResults<Auction>>()
@@ -17,8 +18,11 @@ const Listings = () => {
     useShallow((state) => ({
       pageNumber: state.pageNumber,
       pageSize: state.pageSize,
-      pageCount: state.pageCount,
       searchTerm: state.searchTerm,
+      orderBy: state.orderBy,
+      filterBy: state.filterBy,
+      seller: state.seller,
+      winner: state.winner,
     }))
   )
 
@@ -33,27 +37,33 @@ const Listings = () => {
     getData(url).then((data: PagedResults<Auction>) => {
       setData(data)
     })
-  }, [url])
+  }, [url, setData])
 
   if (!data) {
-    return <div>Loading...</div>
+    return <h3>Loading...</h3>
   }
 
   return (
     <>
       <Filters />
-      <div className='grid grid-cols-4 gap-6'>
-        {data.results.map((auction) => (
-          <AuctionCard key={auction.id} auction={auction} />
-        ))}
-      </div>
-      <div className='flex justify-center mt-4'>
-        <AppPagination
-          pageChanged={setPageNumber}
-          currentPage={params.pageNumber}
-          pageCount={data.pageCount}
-        />
-      </div>
+      {data.totalCount === 0 ? (
+        <EmptyFilter showReset />
+      ) : (
+        <>
+          <div className='grid grid-cols-4 gap-6'>
+            {data.results.map((auction) => (
+              <AuctionCard key={auction.id} auction={auction} />
+            ))}
+          </div>
+          <div className='flex justify-center mt-4'>
+            <AppPagination
+              pageChanged={setPageNumber}
+              currentPage={params.pageNumber}
+              pageCount={data.pageCount}
+            />
+          </div>
+        </>
+      )}
     </>
   )
 }
