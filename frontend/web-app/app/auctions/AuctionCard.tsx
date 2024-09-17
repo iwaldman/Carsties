@@ -1,5 +1,5 @@
-import CountdownTimer from '@/components/CountdownTimer'
-import CarImage from '@/components/CarImage'
+import CountdownTimer from '@/app/auctions/CountdownTimer'
+import CarImage from '@/app/auctions/CarImage'
 import { Auction } from '@/types'
 
 type Props = {

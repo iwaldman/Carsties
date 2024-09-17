@@ -1,11 +1,11 @@
 'use client'
 
 import { Auction, PagedResults } from '@/types'
-import AuctionCard from '@/components/AuctionCard'
+import AuctionCard from '@/app/auctions/AuctionCard'
 import AppPagination from '@/components/AppPagination'
 import { useState, useEffect } from 'react'
 import getData from '@/app/actions/auctionActions'
-import Filters from '@/components/Filters'
+import Filters from '@/app/auctions/Filters'
 import { useShallow } from 'zustand/shallow'
 import { useParamsStore } from '@/hooks/useParamsStore'
 import qs from 'query-string'
