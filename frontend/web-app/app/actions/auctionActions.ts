@@ -2,7 +2,7 @@
 
 import { Auction, PagedResults } from '@/types'
 
-async function getData(query: string): Promise<PagedResults<Auction>> {
+export async function getData(query: string): Promise<PagedResults<Auction>> {
   console.log('getData', query)
   const response = await fetch(`http://localhost:6001/search${query}`)
 
@@ -13,5 +13,3 @@ async function getData(query: string): Promise<PagedResults<Auction>> {
   const data = await response.json()
   return data
 }
-
-export default getData
