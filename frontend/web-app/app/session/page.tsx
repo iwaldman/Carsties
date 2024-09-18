@@ -13,10 +13,6 @@ export default async function Session() {
         <h3 className='text-lg'>Session data</h3>
         <pre className='whitespace-pre-wrap break-all'>{JSON.stringify(session, null, 2)}</pre>
       </div>
-
-      <div className='mt-4'>
-        <AuthTest />
-      </div>
     </div>
   )
 }
