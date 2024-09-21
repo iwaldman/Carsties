@@ -1,19 +1,18 @@
 'use client'
 
-import { Auction, PagedResults } from '@/types'
-import AuctionCard from '@/app/auctions/AuctionCard'
-import AppPagination from '@/components/AppPagination'
-import { useState, useEffect } from 'react'
-import { getData } from '@/app/actions/auctionActions'
-import Filters from '@/app/auctions/Filters'
-import { useShallow } from 'zustand/shallow'
+import React, { useEffect, useState } from 'react'
+import AuctionCard from './AuctionCard'
+import AppPagination from '../components/AppPagination'
+import { getData } from '../actions/auctionActions'
+import Filters from './Filters'
 import { useParamsStore } from '@/hooks/useParamsStore'
+import { useShallow } from 'zustand/react/shallow'
 import qs from 'query-string'
-import EmptyFilter from '@/components/EmptyFilter'
+import EmptyFilter from '../components/EmptyFilter'
+import { useAuctionStore } from '@/hooks/useAuctionStore'
 
-const Listings = () => {
-  const [data, setData] = useState<PagedResults<Auction>>()
-
+export default function Listings() {
+  const [loading, setLoading] = useState(true)
   const params = useParamsStore(
     useShallow((state) => ({
       pageNumber: state.pageNumber,
@@ -25,7 +24,14 @@ const Listings = () => {
       winner: state.winner,
     }))
   )
-
+  const data = useAuctionStore(
+    useShallow((state) => ({
+      auctions: state.auctions,
+      totalCount: state.totalCount,
+      pageCount: state.pageCount,
+    }))
+  )
+  const setData = useAuctionStore((state) => state.setData)
   const setParams = useParamsStore((state) => state.setParams)
   const url = qs.stringifyUrl({ url: '', query: params })
 
@@ -34,14 +40,13 @@ const Listings = () => {
   }
 
   useEffect(() => {
-    getData(url).then((data: PagedResults<Auction>) => {
+    getData(url).then((data) => {
       setData(data)
+      setLoading(false)
     })
   }, [url, setData])
 
-  if (!data) {
-    return <h3>Loading...</h3>
-  }
+  if (loading) return <h3>Loading...</h3>
 
   return (
     <>
@@ -51,7 +56,7 @@ const Listings = () => {
       ) : (
         <>
           <div className='grid grid-cols-4 gap-6'>
-            {data.results.map((auction) => (
+            {data.auctions.map((auction) => (
               <AuctionCard key={auction.id} auction={auction} />
             ))}
           </div>
@@ -67,5 +72,3 @@ const Listings = () => {
     </>
   )
 }
-
-export default Listings

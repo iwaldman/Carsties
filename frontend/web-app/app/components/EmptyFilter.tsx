@@ -2,7 +2,7 @@
 
 import { useParamsStore } from '@/hooks/useParamsStore'
 import React from 'react'
-import Heading from '@/components/Heading'
+import Heading from '@/app/components/Heading'
 import { Button } from 'flowbite-react'
 import { signIn } from 'next-auth/react'
 

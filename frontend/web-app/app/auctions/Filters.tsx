@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useParamsStore } from '@/hooks/useParamsStore'
 import { Button, ButtonGroup } from 'flowbite-react'
 import { AiOutlineClockCircle, AiOutlineSortAscending } from 'react-icons/ai'

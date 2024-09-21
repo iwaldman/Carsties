@@ -2,13 +2,13 @@
 
 import { Pagination } from 'flowbite-react'
 
-type AppPaginationProps = {
+type Props = {
   currentPage: number
   pageCount: number
   pageChanged: (page: number) => void
 }
 
-export default function AppPagination({ currentPage, pageCount, pageChanged }: AppPaginationProps) {
+export default function AppPagination({ currentPage, pageCount, pageChanged }: Props) {
   return (
     <Pagination
       currentPage={currentPage}

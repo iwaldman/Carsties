@@ -1,7 +1,7 @@
 import Search from './Search'
 import Logo from './Logo'
 import LoginButton from './LoginButton'
-import { getCurrentUser } from '@/app/actions/authActions'
+import { getCurrentUser } from '../actions/authActions'
 import UserActions from './UserActions'
 
 export default async function Navbar() {
