@@ -14,25 +14,28 @@ public class BidsController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<Bid>> Post(string auctionId, int amount)
+    public async Task<ActionResult<Bid>> PlaceBid(string auctionId, int amount)
     {
         var auction = await DB.Find<Auction>().OneAsync(auctionId);
 
         if (auction is null)
         {
-            return NotFound();
+            return BadRequest("Cannot accept bids on this auction at this time");
         }
 
         if (auction.Seller == User.Identity?.Name)
         {
-            return BadRequest("You cannot bid on your own auction.");
+            return BadRequest("You cannot bid on your own item");
         }
 
-        var bid = new Bid
+        if (User.Identity?.Name is null)
+            return Unauthorized();
+
+        var bid = new Bid()
         {
-            AuctionId = auctionId,
             Amount = amount,
-            Bidder = User.Identity?.Name!
+            AuctionId = auctionId,
+            Bidder = User.Identity.Name
         };
 
         if (auction.AuctionEnd < DateTime.UtcNow)
@@ -41,13 +44,12 @@ public class BidsController : ControllerBase
         }
         else
         {
-            var highestBid = await DB.Find<Bid>()
-                .Match(b => b.AuctionId == auctionId)
-                .Sort(b => b.Descending(b => b.Amount))
-                .Limit(1)
+            var highBid = await DB.Find<Bid>()
+                .Match(a => a.AuctionId == auctionId)
+                .Sort(b => b.Descending(x => x.Amount))
                 .ExecuteFirstAsync();
 
-            if (highestBid is not null && amount > highestBid.Amount || highestBid is null)
+            if (highBid != null && amount > highBid.Amount || highBid == null)
             {
                 bid.BidStatus =
                     amount > auction.ReservePrice
@@ -55,7 +57,7 @@ public class BidsController : ControllerBase
                         : BidStatus.AcceptedBelowReserve;
             }
 
-            if (highestBid is not null && amount <= highestBid.Amount)
+            if (highBid != null && bid.Amount <= highBid.Amount)
             {
                 bid.BidStatus = BidStatus.TooLow;
             }
@@ -63,7 +65,7 @@ public class BidsController : ControllerBase
 
         await DB.SaveAsync(bid);
 
-        return Ok(bid);
+        return Ok();
     }
 
     [HttpGet("{auctionId}")]
