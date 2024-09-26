@@ -14,7 +14,7 @@ public class BidPlacedConsumer(AuctionDbContext auctionDbContext) : IConsumer<Bi
         );
 
         var auction =
-            await auctionDbContext.Auctions.FindAsync(context.Message.AuctionId)
+            await auctionDbContext.Auctions.FindAsync(Guid.Parse(context.Message.AuctionId))
             ?? throw new ArgumentException(
                 $"Auction with id {context.Message.AuctionId} not found"
             );

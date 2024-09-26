@@ -12,8 +12,12 @@ public class AuctionFinishedConsumer(AuctionDbContext auctionDbContext) : IConsu
     {
         Console.WriteLine($"Auction finished: {context.Message.AuctionId}.");
 
-        var auction = await auctionDbContext.Auctions.FindAsync(context.Message.AuctionId) ?? throw new ArgumentException($"Auction with id {context.Message.AuctionId} not found");
-        
+        var auction =
+            await auctionDbContext.Auctions.FindAsync(Guid.Parse(context.Message.AuctionId))
+            ?? throw new ArgumentException(
+                $"Auction with id {context.Message.AuctionId} not found"
+            );
+
         if (context.Message.ItemSold)
         {
             auction.Winner = context.Message.Winner;
