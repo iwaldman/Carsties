@@ -2,9 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 EXPOSE 80
 
-# Copy all .csproj files and restore as distinct layers. Use of the same COPY command
-# for every Dockerfile in the project to take advantage of Docker caching.
-
+# copy all .csproj files and restore as distinct layers.  Use the same COPY
+# for every dockerfile in the project to take advantage of Docker caching
 COPY Carsties.sln Carsties.sln
 COPY src/AuctionService/AuctionService.csproj src/AuctionService/AuctionService.csproj
 COPY src/SearchService/SearchService.csproj src/SearchService/SearchService.csproj
@@ -14,18 +13,17 @@ COPY src/NotificationService/NotificationService.csproj src/NotificationService/
 COPY src/IdentityService/IdentityService.csproj src/IdentityService/IdentityService.csproj
 COPY src/Contracts/Contracts.csproj src/Contracts/Contracts.csproj
 
-# Restore all projects
+# Restore package deps
 RUN dotnet restore Carsties.sln
 
-# Copy everything else and build
-COPY src/SearchService/. src/SearchService/
-COPY src/Contracts/. src/Contracts/
-
-WORKDIR /app/src/SearchService
+# Copy the app folders over
+COPY src/NotificationService src/NotificationService
+COPY src/Contracts src/Contracts
+WORKDIR /app/src/NotificationService
 RUN dotnet publish -c Release -o /app/src/out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/src/out ./
-ENTRYPOINT ["dotnet", "SearchService.dll"]
+COPY --from=build /app/src/out .
+ENTRYPOINT [ "dotnet", "NotificationService.dll" ]
