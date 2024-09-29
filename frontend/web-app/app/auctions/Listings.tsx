@@ -13,6 +13,7 @@ import { useAuctionStore } from '@/hooks/useAuctionStore'
 
 export default function Listings() {
   const [loading, setLoading] = useState(true)
+
   const params = useParamsStore(
     useShallow((state) => ({
       pageNumber: state.pageNumber,
@@ -24,6 +25,7 @@ export default function Listings() {
       winner: state.winner,
     }))
   )
+
   const data = useAuctionStore(
     useShallow((state) => ({
       auctions: state.auctions,
@@ -31,6 +33,7 @@ export default function Listings() {
       pageCount: state.pageCount,
     }))
   )
+  
   const setData = useAuctionStore((state) => state.setData)
   const setParams = useParamsStore((state) => state.setParams)
   const url = qs.stringifyUrl({ url: '', query: params })
