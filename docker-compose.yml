@@ -23,7 +23,7 @@ services:
       - '5672:5672'
       - '15672:15672'
   auction-svc:
-    image: iwaldman/auction-svc:latest
+    image: trycatchlearn/auction-svc:latest
     build:
       context: .
       dockerfile: src/AuctionService/Dockerfile
@@ -45,7 +45,7 @@ services:
       - postgres
       - rabbitmq
   search-svc:
-    image: iwaldman/search-svc:latest
+    image: trycatchlearn/search-svc:latest
     build:
       context: .
       dockerfile: src/SearchService/Dockerfile
@@ -61,31 +61,31 @@ services:
       - mongodb
       - rabbitmq
   identity-svc:
-    image: iwaldman/identity-svc:latest
+    image: trycatchlearn/identity-svc:latest
     build:
       context: .
       dockerfile: src/IdentityService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
-      - IssuerUri=http://id.carsties.local
-      - ClientApp=http://app.carsties.local
+      - IssuerUri=https://id.carsties.local
+      - ClientApp=https://app.carsties.local
       - ConnectionStrings__DefaultConnection=Server=postgres; User Id=postgres; Password=postgrespw; Database=identity
       - VIRTUAL_HOST=id.carsties.local
     depends_on:
       - postgres
   gateway-svc:
-    image: iwaldman/gateway-svc:latest
+    image: trycatchlearn/gateway-svc:latest
     build:
       context: .
       dockerfile: src/GatewayService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
-      - ClientApp=http://app.carsties.local
+      - ClientApp=https://app.carsties.local
       - VIRTUAL_HOST=api.carsties.local
   bid-svc:
-    image: iwaldman/bid-svc:latest
+    image: trycatchlearn/bid-svc:latest
     build:
       context: .
       dockerfile: src/BiddingService/Dockerfile
@@ -102,7 +102,7 @@ services:
       - mongodb
       - rabbitmq
   notify-svc:
-    image: iwaldman/notify-svc:latest
+    image: trycatchlearn/notify-svc:latest
     build:
       context: .
       dockerfile: src/NotificationService/Dockerfile
@@ -115,7 +115,7 @@ services:
     depends_on:
       - rabbitmq
   web-app:
-    image: iwaldman/web-app
+    image: trycatchlearn/web-app
     build:
       context: .
       dockerfile: frontend/web-app/Dockerfile
@@ -123,12 +123,12 @@ services:
       - /var/lib/web/data
     environment:
       - AUTH_SECRET="v+sQ5ONpst2RbHx+VxmO2voUQ6xLtAMG4Isjn0zp2uA="
-      - AUTH_URL=http://app.carsties.local
+      - AUTH_URL=https://app.carsties.local
       - AUTH_URL_INTERNAL=http://web-app:3000
       - API_URL=http://gateway-svc/
-      - ID_URL=http://id.carsties.local
+      - ID_URL=https://id.carsties.local
       - ID_URL_INTERNAL=http://identity-svc
-      - NOTIFY_URL=http://api.carsties.local/notifications
+      - NOTIFY_URL=https://api.carsties.local/notifications
       - VIRTUAL_HOST=app.carsties.local
       - VIRTUAL_PORT=3000
   nginx-proxy:
@@ -136,5 +136,7 @@ services:
     container_name: nginx-proxy
     ports:
       - 80:80
+      - 443:443
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./devcerts:/etc/nginx/certs
