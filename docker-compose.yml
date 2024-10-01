@@ -73,6 +73,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - IssuerUri=http://localhost:5000
+      - ClientApp=http://localhost:3000
       - ConnectionStrings__DefaultConnection=Server=postgres; User Id=postgres; Password=postgrespw; Database=identity
     ports:
       - 5000:80
