@@ -6,13 +6,9 @@ const nextConfig = {
     },
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.pixabay.com',
-      },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: 'cdn.pixabay.com' }],
   },
+  output: 'standalone',
 }
 
 export default nextConfig
