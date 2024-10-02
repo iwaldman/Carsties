@@ -14,7 +14,7 @@ namespace AuctionService.Controllers;
 [ApiController]
 [Route("api/auctions")]
 public class AuctionsController(
-    AuctionDbContext auctionDbContext,
+    IAuctionRepository auctionRepository,
     IMapper mapper,
     IPublishEndpoint publishEndpoint
 ) : ControllerBase
@@ -22,35 +22,20 @@ public class AuctionsController(
     [HttpGet]
     public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string? date)
     {
-        var query = auctionDbContext.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
-
-        if (!string.IsNullOrEmpty(date))
-        {
-            query = query.Where(
-                x => x.UpdatedAt.Date.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0
-            );
-        }
-
-        var auctions = await query
-            .ProjectTo<AuctionDto>(mapper.ConfigurationProvider)
-            .ToListAsync();
-
-        return auctions;
+        return await auctionRepository.GetAuctionsAsync(date);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<AuctionDto>> GetAuctionById(Guid id)
     {
-        var auction = await auctionDbContext
-            .Auctions.Include(x => x.Item)
-            .FirstOrDefaultAsync(x => x.Id == id);
+        var auctionDto = await auctionRepository.GetAuctionByIdAsync(id);
 
-        if (auction is null)
+        if (auctionDto is null)
         {
             return NotFound();
         }
 
-        return mapper.Map<AuctionDto>(auction);
+        return auctionDto;
     }
 
     [HttpPost]
@@ -62,7 +47,7 @@ public class AuctionsController(
         // TODO: add current user as the seller
         auction.Seller = User.Identity?.Name ?? "Unknown user";
 
-        auctionDbContext.Auctions.Add(auction);
+        auctionRepository.AddAuction(auction);
 
         var auctionDto = mapper.Map<AuctionDto>(auction);
 
@@ -70,7 +55,7 @@ public class AuctionsController(
 
         await publishEndpoint.Publish(auctionCreated);
 
-        var result = await auctionDbContext.SaveChangesAsync() > 0;
+        var result = await auctionRepository.SaveChangesAsync();
 
         if (!result)
         {
@@ -84,9 +69,7 @@ public class AuctionsController(
     [Authorize]
     public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
     {
-        var auction = await auctionDbContext
-            .Auctions.Include(x => x.Item)
-            .FirstOrDefaultAsync(x => x.Id == id);
+        var auction = await auctionRepository.GetAuctionEntityById(id);
 
         if (auction is null)
         {
@@ -106,7 +89,7 @@ public class AuctionsController(
 
         await publishEndpoint.Publish(auctionUpdated);
 
-        var result = await auctionDbContext.SaveChangesAsync() > 0;
+        var result = await auctionRepository.SaveChangesAsync();
 
         if (result)
         {
@@ -120,7 +103,7 @@ public class AuctionsController(
     [Authorize]
     public async Task<ActionResult> DeleteAuction(Guid id)
     {
-        var auction = await auctionDbContext.Auctions.FirstOrDefaultAsync(x => x.Id == id);
+        var auction = await auctionRepository.GetAuctionEntityById(id);
 
         if (auction is null)
         {
@@ -130,13 +113,13 @@ public class AuctionsController(
         if (auction.Seller != User.Identity?.Name)
             return Forbid();
 
-        auctionDbContext.Remove(auction);
+        auctionRepository.RemoveAuction(auction);
 
         await publishEndpoint.Publish<AuctionDeleted>(
             new AuctionDeleted { Id = auction.Id.ToString() }
         );
 
-        var result = await auctionDbContext.SaveChangesAsync() > 0;
+        var result = await auctionRepository.SaveChangesAsync();
 
         if (!result)
         {

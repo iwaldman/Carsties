@@ -17,6 +17,8 @@ builder.Services.AddDbContext<AuctionDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddMassTransit(x =>
